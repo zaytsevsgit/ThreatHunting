@@ -1,8 +1,12 @@
+---
+  title: "Разработка отчёта"
+  author: "Выполнено Зайцевым Ильёй Владимировичем, mragentseven@yandex.ru"
+  format: 
+    md: 
+      output-file: README.md
+---
+
 # Лабораторная работа №1
-
-## Выполнено Зайцевым Ильёй Владимировичем
-
-## mragentseven@yandex.ru
 
 ## Цель работы 
 
