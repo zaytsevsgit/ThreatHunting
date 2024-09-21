@@ -39,6 +39,21 @@ starwars %>% ncol()
 ```{r}
 starwars %>% glimpse()
 ```
+Сколько уникальных рас персонажей (species) представлено в данных?
+
+```{r}
+starwars %>%
+  distinct(species) %>%
+  nrow()
+```
+Найти самого высокого персонажа.
+
+```{r}
+starwars %>%
+  arrange(desc(height)) %>%
+  slice_head(n = 1) %>%
+  select(name, height)
+```
 
 
 

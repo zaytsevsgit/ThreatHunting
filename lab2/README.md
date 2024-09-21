@@ -69,3 +69,27 @@ starwars %>% glimpse()
     $ films      <list> <"A New Hope", "The Empire Strikes Back", "Return of the J…
     $ vehicles   <list> <"Snowspeeder", "Imperial Speeder Bike">, <>, <>, <>, "Imp…
     $ starships  <list> <"X-wing", "Imperial shuttle">, <>, <>, "TIE Advanced x1",…
+
+Сколько уникальных рас персонажей (species) представлено в данных?
+
+``` r
+starwars %>%
+  distinct(species) %>%
+  nrow()
+```
+
+    [1] 38
+
+Найти самого высокого персонажа.
+
+``` r
+starwars %>%
+  arrange(desc(height)) %>%
+  slice_head(n = 1) %>%
+  select(name, height)
+```
+
+    # A tibble: 1 × 2
+      name        height
+      <chr>        <int>
+    1 Yarael Poof    264
