@@ -16,43 +16,98 @@
 
 Загружаем необходимую библиотеку
 
-``` r
-library(dplyr)
-```
+    ::: {.cell}
 
+    ```{.r .cell-code}
+    library(dplyr)
+    ```
+
+    ::: {.cell-output .cell-output-stderr}
+
+    ```
 
     Attaching package: 'dplyr'
+    ```
 
+
+    :::
+
+    ::: {.cell-output .cell-output-stderr}
+
+    ```
     The following objects are masked from 'package:stats':
 
         filter, lag
+    ```
 
+
+    :::
+
+    ::: {.cell-output .cell-output-stderr}
+
+    ```
     The following objects are masked from 'package:base':
 
         intersect, setdiff, setequal, union
+    ```
+
+
+    :::
+    :::
 
 1.  Сколько строк в датафрейме?
 
-``` r
-starwars %>% nrow()
-```
+<!-- -->
 
+    ::: {.cell}
+
+    ```{.r .cell-code}
+    starwars %>% nrow()
+    ```
+
+    ::: {.cell-output .cell-output-stdout}
+
+    ```
     [1] 87
+    ```
+
+
+    :::
+    :::
 
 1.  Сколько столбцов в датафрейме?
 
-``` r
-starwars %>% ncol()
-```
+<!-- -->
 
+    ::: {.cell}
+
+    ```{.r .cell-code}
+    starwars %>% ncol()
+    ```
+
+    ::: {.cell-output .cell-output-stdout}
+
+    ```
     [1] 14
+    ```
+
+
+    :::
+    :::
 
 1.  Как просмотреть примерный вид датафрейма?
 
-``` r
-starwars %>% glimpse()
-```
+<!-- -->
 
+    ::: {.cell}
+
+    ```{.r .cell-code}
+    starwars %>% glimpse()
+    ```
+
+    ::: {.cell-output .cell-output-stdout}
+
+    ```
     Rows: 87
     Columns: 14
     $ name       <chr> "Luke Skywalker", "C-3PO", "R2-D2", "Darth Vader", "Leia Or…
@@ -69,3 +124,8 @@ starwars %>% glimpse()
     $ films      <list> <"A New Hope", "The Empire Strikes Back", "Return of the J…
     $ vehicles   <list> <"Snowspeeder", "Imperial Speeder Bike">, <>, <>, <>, "Imp…
     $ starships  <list> <"X-wing", "Imperial shuttle">, <>, <>, "TIE Advanced x1",…
+    ```
+
+
+    :::
+    :::
