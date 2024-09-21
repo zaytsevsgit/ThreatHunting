@@ -93,3 +93,50 @@ starwars %>%
       name        height
       <chr>        <int>
     1 Yarael Poof    264
+
+Найти всех персонажей ниже 170.
+
+``` r
+starwars %>%
+  filter(height < 170) %>%
+  select(name, height)
+```
+
+    # A tibble: 22 × 2
+       name                  height
+       <chr>                  <int>
+     1 C-3PO                    167
+     2 R2-D2                     96
+     3 Leia Organa              150
+     4 Beru Whitesun Lars       165
+     5 R5-D4                     97
+     6 Yoda                      66
+     7 Mon Mothma               150
+     8 Wicket Systri Warrick     88
+     9 Nien Nunb                160
+    10 Watto                    137
+    # ℹ 12 more rows
+
+Подсчитать ИМТ (индекс массы тела) для всех персонажей. ИМТ подсчитать
+по формуле.
+
+``` r
+starwars %>%
+  mutate(bmi = mass / (height / 100)^2) %>%
+  select(name, height, mass, bmi)
+```
+
+    # A tibble: 87 × 4
+       name               height  mass   bmi
+       <chr>               <int> <dbl> <dbl>
+     1 Luke Skywalker        172    77  26.0
+     2 C-3PO                 167    75  26.9
+     3 R2-D2                  96    32  34.7
+     4 Darth Vader           202   136  33.3
+     5 Leia Organa           150    49  21.8
+     6 Owen Lars             178   120  37.9
+     7 Beru Whitesun Lars    165    75  27.5
+     8 R5-D4                  97    32  34.0
+     9 Biggs Darklighter     183    84  25.1
+    10 Obi-Wan Kenobi        182    77  23.2
+    # ℹ 77 more rows

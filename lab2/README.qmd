@@ -54,6 +54,19 @@ starwars %>%
   slice_head(n = 1) %>%
   select(name, height)
 ```
+Найти всех персонажей ниже 170.
+```{r}
+starwars %>%
+  filter(height < 170) %>%
+  select(name, height)
+```
+Подсчитать ИМТ (индекс массы тела) для всех персонажей. ИМТ подсчитать по
+формуле.
+```{r}
+starwars %>%
+  mutate(bmi = mass / (height / 100)^2) %>%
+  select(name, height, mass, bmi)
+```
 
 
 
