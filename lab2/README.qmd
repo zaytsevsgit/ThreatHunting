@@ -19,27 +19,26 @@ dplyr – функции select(), filter(), mutate(), arrange(), group_by()
 
  Загружаем необходимую библиотеку
 
-    ```{r}
-    library(dplyr)
-    ```
+```{r}
+library(dplyr)
+```
  
   1. Сколько строк в датафрейме?
 
-    ```{r}
-    starwars %>% nrow()
-    ```
+```{r}
+starwars %>% nrow()
+```
  
   2. Сколько столбцов в датафрейме?
 
-    ```{r}
-    starwars %>% ncol()
-    ```
-    
+```{r}
+starwars %>% ncol()
+```
   3. Как просмотреть примерный вид датафрейма?
   
-    ```{r}
-    starwars %>% glimpse()
-    ```
+```{r}
+starwars %>% glimpse()
+```
 
 
 
