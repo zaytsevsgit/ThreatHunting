@@ -18,7 +18,8 @@ dplyr – функции select(), filter(), mutate(), arrange(), group_by()
 ## Шаги
 
  1. Устанавливаем dplyr
-    ```
+
+```
     > install.packages("tidyverse")
 Installing package into ‘C:/Users/frenz/AppData/Local/R/win-library/4.4’
 (as ‘lib’ is unspecified)
@@ -302,4 +303,4 @@ package ‘tidyverse’ successfully unpacked and MD5 sums checked
 
 The downloaded binary packages are in
 	C:\Users\frenz\AppData\Local\Temp\RtmpsTqiI0\downloaded_packages
-    ```
+```
