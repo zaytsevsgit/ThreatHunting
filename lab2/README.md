@@ -14,11 +14,9 @@
 
 ## Шаги
 
-1.  Сколько строк в датафрейме?
+Загружаем необходимую библиотеку
 
 ``` r
-# Загружаем необходимую библиотеку
-
 library(dplyr)
 ```
 
@@ -32,6 +30,8 @@ library(dplyr)
     The following objects are masked from 'package:base':
 
         intersect, setdiff, setequal, union
+
+1.  Сколько строк в датафрейме?
 
 ``` r
 starwars %>% nrow()
