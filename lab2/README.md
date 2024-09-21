@@ -1,4 +1,4 @@
-# Введение в R
+# Основы обработки данных с помощью R и Dplyr
 Выполнено Зайцевым Ильей Владимировичем, mragentseven@yandex.ru
 
 # Лабораторная работа №2
@@ -7,66 +7,65 @@
 
 1.  Развить практические навыки использования языка программирования R
     для обработки данных
-2.  Развить навыки работы в Rstudio IDE: установка пакетов работа с
-    проектами в Rstudio настройка и работа с Git
-3.  Закрепить знания базовых типов данных языка R и простейших операций
-    с ними
+2.  Закрепить знания базовых типов данных языка R
+3.  Развить практические навыки использования функций обработки данных
+    пакета dplyr – функции select(), filter(), mutate(), arrange(),
+    group_by()
 
 ## Шаги
 
-1.  Устанавливаем swirl
+1.  Сколько строк в датафрейме?
 
-    ![](img/1.png)
+``` r
+# Загружаем необходимую библиотеку
 
-2.  Запускаем задание с помощью swirl::swirl()
+library(dplyr)
+```
 
-    ![](img/2.png)
 
-3.  Выбираем первый пункт
+    Attaching package: 'dplyr'
 
-    ![](img/3.png)
+    The following objects are masked from 'package:stats':
 
-4.  Проходим подкурсы. Basic Building Blocks
+        filter, lag
 
-    ![](img/4.png) ![](img/5.png) ![](img/6.png) ![](img/7.png)
-    ![](img/8.png) ![](img/9.png) ![](img/10.png) ![](img/11.png)
-    ![](img/12.png) ![](img/13.png) ![](img/14.png) ![](img/15.png)
-    ![](img/16.png) ![](img/17.png) ![](img/18.png) ![](img/19.png)
-    ![](img/19.png) ![](img/20.png) ![](img/21.png) ![](img/22.png)
-    ![](img/23.png) ![](img/24.png) ![](img/25.png) ![](img/26.png)
-    ![](img/27.png) ![](img/28.png) ![](img/29.png) ![](img/30.png)
+    The following objects are masked from 'package:base':
 
-5.  Workspace and Files ![](img/31.png) ![](img/32.png) ![](img/33.png)
-    ![](img/34.png) ![](img/35.png) ![](img/36.png) ![](img/37.png)
-    ![](img/38.png) ![](img/39.png) ![](img/40.png) ![](img/41.png)
-    ![](img/42.png) ![](img/43.png) ![](img/44.png) ![](img/45.png)
-    ![](img/46.png) ![](img/47.png) ![](img/48.png) ![](img/49.png)
-    ![](img/50.png) ![](img/51.png) ![](img/52.png) ![](img/53.png)
+        intersect, setdiff, setequal, union
 
-6.  Sequences of Numbers ![](img/54.png) ![](img/55.png) ![](img/56.png)
-    ![](img/57.png) ![](img/58.png) ![](img/59.png) ![](img/60.png)
-    ![](img/61.png) ![](img/62.png) ![](img/63.png) ![](img/64.png)
-    ![](img/65.png) ![](img/66.png) ![](img/67.png) ![](img/68.png)
+``` r
+starwars %>% nrow()
+```
 
-7.  Vectors ![](img/69.png) ![](img/70.png) ![](img/71.png)
-    ![](img/72.png) ![](img/73.png) ![](img/74.png) ![](img/75.png)
-    ![](img/76.png) ![](img/77.png) ![](img/78.png) ![](img/79.png)
-    ![](img/80.png) ![](img/81.png) ![](img/82.png) ![](img/83.png)
-    ![](img/84.png) ![](img/85.png) ![](img/87.png) ![](img/88.png)
-    ![](img/89.png) ![](img/90.png)
+    [1] 87
 
-8.  Missing Values ![](img/91.png) ![](img/92.png) ![](img/93.png)
-    ![](img/94.png) ![](img/95.png) ![](img/96.png) ![](img/97.png)
-    ![](img/98.png) ![](img/99.png) ![](img/100.png) ![](img/101.png)
-    ![](img/102.png) ![](img/103.png) ![](img/104.png) ![](img/105.png)
+1.  Сколько столбцов в датафрейме?
 
-## Оценка результата
+``` r
+starwars %>% ncol()
+```
 
-В результате работы была установлена библиотека swirl и были пройдены
-все 5 модулей курса “R Programming: The basics of programming in R”
+    [1] 14
 
-## Вывод
+1.  Как просмотреть примерный вид датафрейма?
 
-Были развиты практические навыки использования языка программирования R
-для обработки данных и закреплены знания базовых типов данных языка R и
-простейших операций с ними
+``` r
+starwars %>% glimpse()
+```
+
+    Rows: 87
+    Columns: 14
+    $ name       <chr> "Luke Skywalker", "C-3PO", "R2-D2", "Darth Vader", "Leia Or…
+    $ height     <int> 172, 167, 96, 202, 150, 178, 165, 97, 183, 182, 188, 180, 2…
+    $ mass       <dbl> 77.0, 75.0, 32.0, 136.0, 49.0, 120.0, 75.0, 32.0, 84.0, 77.…
+    $ hair_color <chr> "blond", NA, NA, "none", "brown", "brown, grey", "brown", N…
+    $ skin_color <chr> "fair", "gold", "white, blue", "white", "light", "light", "…
+    $ eye_color  <chr> "blue", "yellow", "red", "yellow", "brown", "blue", "blue",…
+    $ birth_year <dbl> 19.0, 112.0, 33.0, 41.9, 19.0, 52.0, 47.0, NA, 24.0, 57.0, …
+    $ sex        <chr> "male", "none", "none", "male", "female", "male", "female",…
+    $ gender     <chr> "masculine", "masculine", "masculine", "masculine", "femini…
+    $ homeworld  <chr> "Tatooine", "Tatooine", "Naboo", "Tatooine", "Alderaan", "T…
+    $ species    <chr> "Human", "Droid", "Droid", "Human", "Human", "Human", "Huma…
+    $ films      <list> <"A New Hope", "The Empire Strikes Back", "Return of the J…
+    $ vehicles   <list> <"Snowspeeder", "Imperial Speeder Bike">, <>, <>, <>, "Imp…
+    $ starships  <list> <"X-wing", "Imperial shuttle">, <>, <>, "TIE Advanced x1",…
