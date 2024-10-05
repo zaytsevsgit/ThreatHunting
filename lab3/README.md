@@ -33,7 +33,6 @@ library(dplyr)
 
 ``` r
 library(nycflights13)
-library(knitr)
 ```
 
 Сколько встроенных в пакет nycflights13 датафреймов?

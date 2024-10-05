@@ -23,7 +23,6 @@ dplyr – функции select(), filter(), mutate(), arrange(), group_by()
 ```{r}
 library(dplyr)
 library(nycflights13)
-library(knitr)
 ```
 
 Сколько встроенных в пакет nycflights13 датафреймов?
