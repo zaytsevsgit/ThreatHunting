@@ -22,7 +22,7 @@ format:
 1.  Программное обеспечение Windows 11 Pro
 2.  Rstudio Desktop
 3.  Интерпретатор языка R 4.4.1
-3.  csv данные p2_wifi_data
+3.  Данные csv-файла P2_wifi_data
 
 ## План
 
@@ -31,7 +31,7 @@ format:
 
 ## Шаги
 
-1. Импортируем csv файл, учитывая два датасета.
+1. Импортируйте данные
 
 ```{r}
 library(tidyverse)
@@ -42,10 +42,10 @@ dataset1 <- read.csv("P2_wifi_data.csv", nrows = 167)
 dataset2 <- read.csv("P2_wifi_data.csv", skip = 169)
 ```
 
-2. Приводим данные к соответствующим типам.
+2. Привести датасеты в вид “аккуратных данных”, преобразовать типы столбцов в
+соответствии с типом данных
 
 ```{r}
-
 dataset1 <- dataset1 %>% 
   mutate_at(vars(BSSID, Privacy, Cipher, Authentication, LAN.IP, ESSID), trimws) %>%
   mutate_at(vars(BSSID, Privacy, Cipher, Authentication, LAN.IP, ESSID), na_if, "")
@@ -59,13 +59,16 @@ dataset2 <- dataset2 %>%
 
 dataset2$First.time.seen <- as.POSIXct(dataset2$First.time.seen, format = "%Y-%m-%d %H:%M:%S")
 dataset2$Last.time.seen <- as.POSIXct(dataset2$Last.time.seen, format = "%Y-%m-%d %H:%M:%S")
+```
 
+3. Просмотрите общую структуру данных с помощью функции glimpse()
+```{r}
 glimpse(dataset1)
 glimpse(dataset2)
-
 ```
-3. Точки доступа
-  a. Определить небезопасные точки доступа (без шифрования – OPN)
+
+Точки доступа
+  1. Определить небезопасные точки доступа (без шифрования – OPN)
   
 ```{r}
 unsafe_access_points <- dataset1 %>% filter(grepl("OPN", Privacy))
@@ -74,7 +77,7 @@ unsafe_access_points %>% select(BSSID, ESSID, Privacy) %>%
 kable
 ```
   
-  b. Определить производителя для каждого обнаруженного устройства
+  2. Определить производителя для каждого обнаруженного устройства
   
   E8:28:C1 - Eltex Enterprise Ltd
   00:25:00 - Apple Inc
@@ -84,7 +87,7 @@ kable
   00:3E:1A - Xerox
   00:03:7F6 - Atheros Communications, Inc.
   
-  c. Выявить устройства, использующие последнюю версию протокола шифрования WPA3, и названия точек доступа, реализованных на этих устройствах
+  3. Выявить устройства, использующие последнюю версию протокола шифрования WPA3, и названия точек доступа, реализованных на этих устройствах
   
 ```{r}
 wpa3_devices <- dataset1 %>% filter(grepl("WPA3", Privacy))
@@ -92,7 +95,7 @@ wpa3_devices <- dataset1 %>% filter(grepl("WPA3", Privacy))
 wpa3_devices %>% select(BSSID, ESSID, Privacy)
 ```
   
-  d. Отсортировать точки доступа по интервалу времени, в течение которого они находились на связи, по убыванию.
+  4. Отсортировать точки доступа по интервалу времени, в течение которого они находились на связи, по убыванию.
 
 ```{r}
 wireNetData <- dataset1 %>% mutate(Time = difftime(Last.time.seen, First.time.seen, units = "mins")) %>% arrange(desc(Time)) %>% select(BSSID, Time)
@@ -102,7 +105,7 @@ wireNetData <- dataset1 %>% mutate(Time = difftime(Last.time.seen, First.time.se
 wireNetData %>% select(BSSID, Time) %>% kable 
 ```
 
-  e.Обнаружить топ-10 самых быстрых точек доступа.
+  5.Обнаружить топ-10 самых быстрых точек доступа.
   
 ```{r}
 top_10_fastest <- dataset1 %>% arrange(desc(Speed)) %>% slice(1:10)
@@ -110,24 +113,15 @@ top_10_fastest <- dataset1 %>% arrange(desc(Speed)) %>% slice(1:10)
 top_10_fastest %>% select(BSSID, ESSID, Speed)
 ```
   
-  f.Отсортировать точки доступа по частоте отправки запросов (beacons) в единицу времени по их убыванию.
+  6.Отсортировать точки доступа по частоте отправки запросов (beacons) в единицу времени по их убыванию.
   
 ```{r}
-library(dplyr)
+beacon_rate <- dataset1 %>% mutate(beacon_rate = beacons /as.numeric(difftime(Last.time.seen,First.time.seen,units="mins"))) %>%filter(!is.infinite(beacon_rate)) %>%arrange(desc(beacon_rate))
 
-beacon_rate <- dataset1 %>% 
-  mutate(beacon_rate = if_else(
-    difftime(Last.time.seen, First.time.seen, units = "mins") != 0,
-    beacons / as.numeric(difftime(Last.time.seen, First.time.seen, units = "mins")),
-    NA_real_)) %>% 
-  filter(!is.infinite(beacon_rate) & !is.na(beacon_rate)) %>% 
-  arrange(desc(beacon_rate))
-
-beacon_rate %>% select(BSSID, ESSID, beacon_rate)
-
+beacon_rate %>% select(BSSID, ESSID, beacon_rate) %>% kable
 ```
-4. Данные клиентов
-  a) Определить производителя для каждого обнаруженного устройства
+Данные клиентов
+  1. Определить производителя для каждого обнаруженного устройства
   
 ```{r}
 manufa <- dataset2 %>% filter(BSSID != '(not associated)') %>% mutate(Manufacturer = substr(BSSID, 1, 8)) %>% select(Manufacturer)
@@ -135,25 +129,8 @@ manufa <- dataset2 %>% filter(BSSID != '(not associated)') %>% mutate(Manufactur
 unique(manufa) %>%
   kable
 ```
-    DC:09:4C Huawei Technologies Co.,Ltd
 
-    00:25:00 Apple, Inc.
-
-    00:03:7F Atheros Communications, Inc.
-
-    00:23:EB Cisco Systems, Inc
-
-    00:0D:97 Hitachi Energy USA Inc.
-
-    08:3A:2F Guangzhou Juan Intelligent Tech Joint Stock Co.,Ltd
-
-    E0:D9:E3 Eltex Enterprise Ltd.
-
-    E8:28:C1 Eltex Enterprise Ltd.
-
-    0C:80:63 Tp-Link Technologies Co.,Ltd.
-  
-  b) Обнаружить устройства, которые НЕ рандомизируют свой MAC адрес
+  2. Обнаружить устройства, которые НЕ рандомизируют свой MAC адрес
   
 ```{r}
 non_randomized_mac <- dataset2 %>% filter(!grepl("^02|^06|^0A|^0E", BSSID)) %>% filter(BSSID != '(not associated)')
@@ -162,7 +139,7 @@ non_randomized_mac %>% select(BSSID) %>% kable
 ```
   
   
-  c) Кластеризовать запросы от устройств к точкам доступа по их именам. Определить время появления устройства в зоне радиовидимости и время выхода его из нее.
+  3. Кластеризовать запросы от устройств к точкам доступа по их именам. Определить время появления устройства в зоне радиовидимости и время выхода его из нее.
   
 ```{r}
 clustered_requests <- dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(
@@ -174,7 +151,7 @@ clustered_requests %>%
 ```
   
   
-  d) Оценить стабильность уровня сигнала внури кластера во времени. Выявить наиболее стабильный кластер.
+  4. Оценить стабильность уровня сигнала внури кластера во времени. Выявить наиболее стабильный кластер.
   
 ```{r}
 signal_stability <- dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(sd_signal = sd(Power, na.rm = TRUE)) %>% arrange(sd_signal)
