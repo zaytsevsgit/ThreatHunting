@@ -1,5 +1,6 @@
 ---
-title: "Беспроводные сети"
+title: "Использование технологии Yandex DataLens для анализа
+данных сетевой активности"
 author: "mragentseven@yandex.ru"
 format: 
   md:
@@ -44,8 +45,6 @@ format:
 
 
 
-```{r}
-```
 
 
 

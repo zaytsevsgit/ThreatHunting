@@ -1,5 +1,6 @@
 ---
-title: "Беспроводные сети"
+title: "Исследование информации о состоянии беспроводных
+сетей"
 author: "mragentseven@yandex.ru"
 format: 
   md:
