@@ -1,7 +1,6 @@
 ---
-title: "Анализ данных сетевого трафика при помощи библиотеки
-Arrow"
-author: "mragentseven@yandex.ru"
+title: "Анализ данных сетевого трафика при помощи библиотеки Arrow"
+author: "Выполнено Зайцевым Ильей Владимировичем, mragentseven@yandex.ru"
 format: 
   md:
     output-file: README.md
@@ -18,5 +17,18 @@ format:
 4. Получить навыки применения облачных технологий хранения, подготовки и
 анализа данных: Yandex Object Storage, Rstudio Server.
 
+## Исходные данные 
+1. Программное обеспечение Windows 11 Pro
+2. Yandex Object Storage
+3. Библиотека Apache Arrow
+4. Rstudio Desktop
+
+## Ход работы
+
+Для получения данных можно использовать функцию read_parquet или open_dataset
+пакета arrow
+
 ```{r}
+library(arrow)
+df <- arrow::open_dataset(sources = "tm_data.pqt", format = "parquet")
 ```
