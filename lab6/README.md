@@ -2,7 +2,7 @@
 активности
 mragentseven@yandex.ru
 
-# Лабораторная работа №6. Использование технологии Yandex Query DataLens для анализа данных сетевой активности
+# Лабораторная работа №6
 
 ## Цель работы
 
@@ -89,6 +89,8 @@ and \[src\] not LIKE ‘13.%’ and \[src\] not LIKE ‘14.%’)) THEN “Вхо
 ![](img/8.png)
 
 ![](img/9.png)
+
+Ссылка на дашборд: https://datalens.yandex/gwz7l31pmm723
 
 ## Оценка результата
 
