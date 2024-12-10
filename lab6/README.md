@@ -90,7 +90,7 @@ and \[src\] not LIKE ‘13.%’ and \[src\] not LIKE ‘14.%’)) THEN “Вхо
 
 ![](img/9.png)
 
-Ссылка на дашборд: https://datalens.yandex/gwz7l31pmm723
+Ссылка на дашборд: https://datalens.yandex.cloud/gwz7l31pmm723?\_lang=ru
 
 ## Оценка результата
 
