@@ -48,45 +48,19 @@ mragentseven@yandex.ru
 
 ![](img/3.png)
 
-Запрос:
-
-IF ((\[dst\] LIKE ‘12.%’ OR \[dst\] LIKE ‘13.%’ OR \[dst\] LIKE ‘14.%’)
-AND (\[src\] LIKE ‘12.%’ OR \[src\] LIKE ‘13.%’ OR \[src\] LIKE ‘14.%’))
-THEN “Внутренний трафик” ELSE “Внешний трафик” END
-
 1.  Представить в виде столбчатой диаграммы соотношение входящего и
     исходящего трафика из внутреннего сетвого сегмента.
 
 ![](img/4.png)
-
-Запрос:
-
-IF ((\[src\] LIKE ‘12.%’ OR \[src\] LIKE ‘13.%’ OR \[src\] LIKE ‘14.%’)
-AND (\[dst\] not LIKE ‘12.%’ and \[dst\] not LIKE ‘13.%’ and \[dst\] not
-LIKE ‘14.%’)) THEN “Исходящий трафик” ELSEIF ((\[dst\] LIKE ‘12.%’ OR
-\[dst\] LIKE ‘13.%’ OR \[dst\] LIKE ‘14.%’) AND (\[src\] not LIKE ‘12.%’
-and \[src\] not LIKE ‘13.%’ and \[src\] not LIKE ‘14.%’)) THEN “Входящий
-трафик” END
 
 1.  Построить график активности (линейная диаграмма) объема трафика во
     времени.
 
 ![](img/5.png)
 
-Запрос: ROUND((\[timestamp\] - DATETRUNC(\[timestamp\], “second”)) \*
-100000,2)
-
 Создаем дашборд
 
 ![](img/6.png)
-
-Примеры работы с дашбордом
-
-![](img/7.png)
-
-![](img/8.png)
-
-![](img/9.png)
 
 Ссылка на дашборд: https://datalens.yandex.cloud/gwz7l31pmm723?\_lang=ru
 
