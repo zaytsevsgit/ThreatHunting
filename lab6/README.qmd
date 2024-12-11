@@ -1,6 +1,6 @@
 ---
 title: "Использование технологии Yandex DataLens для анализа данных сетевой активности"
-author: "mragentseven@yandex.ru"
+author: "Выполнил Зайцев Илья Владимирович, mragentseven@yandex.ru"
 format: 
   md:
     output-file: README.md
