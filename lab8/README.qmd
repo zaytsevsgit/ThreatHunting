@@ -36,8 +36,8 @@ format:
 Скачиваем данные с поомщью функции download.file
 
 ```{r}
-options(timeout = 1000000)
-download.file("https://storage.yandexcloud.net/arrow-datasets/tm_data.pqt",destfile = "tm_data.pqt")
+#options(timeout = 1000000)
+#download.file("https://storage.yandexcloud.net/arrow-datasets/tm_data.pqt",destfile = "tm_data.pqt")
 ```
 
 Загружаем данные пакета в таблицу tbl
@@ -45,8 +45,11 @@ download.file("https://storage.yandexcloud.net/arrow-datasets/tm_data.pqt",destf
 ```{r}
 library(duckdb)
 library(dplyr)
+
 con <- dbConnect(duckdb())
 dbExecute(con,"CREATE TABLE tbl as SELECT * FROM read_parquet('tm_data.pqt')")
+
+
 ```
 
 Приступаем к выполнению заданий
