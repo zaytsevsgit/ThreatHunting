@@ -36,8 +36,13 @@ format:
 Скачиваем данные с поомщью функции download.file
 
 ```{r}
+<<<<<<< HEAD
 options(timeout = 1000000)
 download.file("https://storage.yandexcloud.net/arrow-datasets/tm_data.pqt",destfile = "tm_data.pqt")
+=======
+#options(timeout = 1000000)
+#download.file("https://storage.yandexcloud.net/arrow-datasets/tm_data.pqt",destfile = "tm_data.pqt")
+>>>>>>> fd4f90f7e8571eba9efe5cfefadf05c5481ccac1
 ```
 
 Загружаем данные пакета в таблицу tbl
