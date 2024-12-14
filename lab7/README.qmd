@@ -1,12 +1,14 @@
 ---
-title: "Анализ данных сетевого трафика при помощи библиотеки Arrow"
-author: "Выполнено Зайцевым Ильей Владимировичем, mragentseven@yandex.ru"
+title: ""
+author: ""
 format: 
   md:
     output-file: README.md
 ---
 
-# Лабораторная работа №7
+# Лабораторная работа №7. Анализ данных сетевого трафика при помощи библиотеки Arrow
+
+## Выполнено Зайцевым Ильей Владимировичем, mragentseven@yandex.ru
 
 ## Цель работы
 
@@ -31,12 +33,16 @@ format:
 library(arrow)
 library(dplyr)
 library(tidyverse)
+#options(timeout = 1000000)
 #download.file("https://storage.yandexcloud.net/arrow-datasets/tm_data.pqt",destfile = "tm_data.pqt")
+
 df <- arrow::open_dataset(sources = "tm_data.pqt", format = "parquet")
 glimpse(df)
 ```
 ```{r}
-glimpse(df)
+file.info("tm_data.pqt")
+
+#glimpse(df)
 ```
 
 Приступаем к выполнению заданий
