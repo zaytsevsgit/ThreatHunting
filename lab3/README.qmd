@@ -39,18 +39,31 @@ library(nycflights13)
 
 ```{r}
 data(package = "nycflights13")$results[, "Item"]
+length(data(package = "nycflights13")$results[, "Item"])
 ```
 
 Сколько строк в каждом датафрейме?
 
 ```{r}
-sapply(list(flights, airlines, airports, planes, weather), nrow)
+list(
+  flights = nrow(flights),
+  airlines = nrow(airlines),
+  airports = nrow(airports),
+  planes = nrow(planes),
+  weather = nrow(weather)
+)
 ```
 
 Сколько столбцов в каждом датафрейме?
 
 ```{r}
-sapply(list(flights, airlines, airports, planes, weather), ncol)
+list(
+  flights = ncol(flights),
+  airlines = ncol(airlines),
+  airports = ncol(airports),
+  planes = ncol(planes),
+  weather = ncol(weather)
+)
 ```
 
 Как просмотреть примерный вид датафрейма?
@@ -70,7 +83,7 @@ length(unique(flights$carrier))
 
 ```{r}
 flights %>%
-  filter(dest == "JFK", month == 5) %>%
+  filter(origin == "JFK", month == 5) %>%
   nrow()
 ```
 
@@ -92,32 +105,30 @@ airports %>%
   head(1)
 ```
 
-Какие бортовые номера у самых старых самолетов?
+Какие бортовые номера у самых старых самолетов? (у десяти самых старых самолетов)
 
 ```{r}
 planes %>%
   arrange(year) %>%
   select(tailnum, year) %>%
-  head(5)
+  head(10)
 ```
 
 Какая средняя температура воздуха была в сентябре в аэропорту John F Kennedy Intl?
 
 ```{r}
-weather %>%
-  filter(origin == "JFK", month == 9) %>%
-  summarise(mean_temp_C = mean((temp - 32) * 5/9, na.rm = TRUE))
+weather %>% filter(origin == "JFK", month == 9) %>% summarise(mean_temp_C = mean((temp - 32) * 5/9, na.rm = TRUE))
 ```
 
 Самолеты какой авиакомпании совершили больше всего вылетов в июне?
 
 ```{r}
 flights %>%
-  filter(month == 6) %>%
-  group_by(carrier) %>%
-  summarise(flight_count = n()) %>%
-  arrange(desc(flight_count)) %>%
-  head(1)
+filter(month == 6) %>%
+group_by(carrier) %>%
+summarise(flight_count = n()) %>%
+arrange(desc(flight_count)) %>%
+head(1)
 ```
 
 Самолеты какой авиакомпании задерживались чаще других в 2013 году?
@@ -132,8 +143,8 @@ flights %>%
 
 ## Оценка результатов
 
-Все задачи выполнены, требуемый результат достигнут
+Все задачи выполнены, получены ответы на все поставленные вопросы
 
 ## Вывод
 
-По итогам работы были развиты практические навыки использования языка программирования R для обработки данных, закреплены знания базовых типов данных языка R и развиты практические навыки использования функций обработки данных пакета dplyr – функции select(), filter(), mutate(), arrange() и group_by()
+По итогам работы были развиты практические навыки использования языка программирования R для обработки данных, закреплены знания базовых типов данных языка R и развиты практические навыки использования функций обработки данных пакета dplyr – функции select(), filter(), mutate(), arrange() и group_by() в рамках работы с программным пакетом nyclights13
