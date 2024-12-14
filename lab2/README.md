@@ -876,10 +876,10 @@ starwars %>%
 
 ``` r
 starwars %>%
-  group_by(eye_color) %>%                     # Группируем по цвету глаз
-  summarise(count = n()) %>%                  # Считаем количество персонажей
-  arrange(desc(count)) %>%                    # Сортировка по убыванию
-  slice(1)                                    # Самый популярный цвет
+  group_by(eye_color) %>%                   
+  summarise(count = n()) %>%                
+  arrange(desc(count)) %>%                  
+  slice(1)                                  
 ```
 
     # A tibble: 1 × 2
