@@ -54,21 +54,65 @@ data(package = "nycflights13")$results[, "Item"]
 
     [1] "airlines" "airports" "flights"  "planes"   "weather" 
 
+``` r
+length(data(package = "nycflights13")$results[, "Item"])
+```
+
+    [1] 5
+
 Сколько строк в каждом датафрейме?
 
 ``` r
-sapply(list(flights, airlines, airports, planes, weather), nrow)
+list(
+  flights = nrow(flights),
+  airlines = nrow(airlines),
+  airports = nrow(airports),
+  planes = nrow(planes),
+  weather = nrow(weather)
+)
 ```
 
-    [1] 336776     16   1458   3322  26115
+    $flights
+    [1] 336776
+
+    $airlines
+    [1] 16
+
+    $airports
+    [1] 1458
+
+    $planes
+    [1] 3322
+
+    $weather
+    [1] 26115
 
 Сколько столбцов в каждом датафрейме?
 
 ``` r
-sapply(list(flights, airlines, airports, planes, weather), ncol)
+list(
+  flights = ncol(flights),
+  airlines = ncol(airlines),
+  airports = ncol(airports),
+  planes = ncol(planes),
+  weather = ncol(weather)
+)
 ```
 
-    [1] 19  2  8  9 15
+    $flights
+    [1] 19
+
+    $airlines
+    [1] 2
+
+    $airports
+    [1] 8
+
+    $planes
+    [1] 9
+
+    $weather
+    [1] 15
 
 Как просмотреть примерный вид датафрейма?
 
@@ -111,11 +155,11 @@ length(unique(flights$carrier))
 
 ``` r
 flights %>%
-  filter(dest == "JFK", month == 5) %>%
+  filter(origin == "JFK", month == 5) %>%
   nrow()
 ```
 
-    [1] 0
+    [1] 9397
 
 Какой самый северный аэропорт?
 
@@ -146,31 +190,35 @@ airports %>%
       <chr>     <dbl>
     1 Telluride  9078
 
-Какие бортовые номера у самых старых самолетов?
+Какие бортовые номера у самых старых самолетов? (у десяти самых старых
+самолетов)
 
 ``` r
 planes %>%
   arrange(year) %>%
   select(tailnum, year) %>%
-  head(5)
+  head(10)
 ```
 
-    # A tibble: 5 × 2
-      tailnum  year
-      <chr>   <int>
-    1 N381AA   1956
-    2 N201AA   1959
-    3 N567AA   1959
-    4 N378AA   1963
-    5 N575AA   1963
+    # A tibble: 10 × 2
+       tailnum  year
+       <chr>   <int>
+     1 N381AA   1956
+     2 N201AA   1959
+     3 N567AA   1959
+     4 N378AA   1963
+     5 N575AA   1963
+     6 N14629   1965
+     7 N615AA   1967
+     8 N425AA   1968
+     9 N383AA   1972
+    10 N364AA   1973
 
 Какая средняя температура воздуха была в сентябре в аэропорту John F
 Kennedy Intl?
 
 ``` r
-weather %>%
-  filter(origin == "JFK", month == 9) %>%
-  summarise(mean_temp_C = mean((temp - 32) * 5/9, na.rm = TRUE))
+weather %>% filter(origin == "JFK", month == 9) %>% summarise(mean_temp_C = mean((temp - 32) * 5/9, na.rm = TRUE))
 ```
 
     # A tibble: 1 × 1
@@ -182,11 +230,11 @@ weather %>%
 
 ``` r
 flights %>%
-  filter(month == 6) %>%
-  group_by(carrier) %>%
-  summarise(flight_count = n()) %>%
-  arrange(desc(flight_count)) %>%
-  head(1)
+filter(month == 6) %>%
+group_by(carrier) %>%
+summarise(flight_count = n()) %>%
+arrange(desc(flight_count)) %>%
+head(1)
 ```
 
     # A tibble: 1 × 2
@@ -194,12 +242,13 @@ flights %>%
       <chr>          <int>
     1 UA              4975
 
-Самолеты какой авиакомпании задерживались чаще других в 2013 году?
+Самолеты какой авиакомпании задерживались чаще других в 2013 году? (и по
+отправлении, и по прибытии)
 
 ``` r
 flights %>%
   group_by(carrier) %>%
-  summarise(avg_delay = mean(arr_delay, na.rm = TRUE)) %>%
+  summarise(avg_delay = mean(dep_delay, na.rm = TRUE)) %>%
   arrange(desc(avg_delay)) %>%
   head(1)
 ```
@@ -207,11 +256,12 @@ flights %>%
     # A tibble: 1 × 2
       carrier avg_delay
       <chr>       <dbl>
-    1 F9           21.9
+    1 F9           20.2
 
 ## Оценка результатов
 
-Все задачи выполнены, получены ответы на все поставленные вопросы
+Все задачи выполнены, получены ответы на все поставленные вопросы по
+содержанию программного пакета nycflights13
 
 ## Вывод
 
@@ -219,4 +269,5 @@ flights %>%
 программирования R для обработки данных, закреплены знания базовых типов
 данных языка R и развиты практические навыки использования функций
 обработки данных пакета dplyr – функции select(), filter(), mutate(),
-arrange() и group_by() в рамках работы с программным пакетом nyclights13
+arrange() и group_by() в рамках работы с программным пакетом
+nycflights13
