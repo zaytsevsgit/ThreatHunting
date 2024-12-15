@@ -8,7 +8,7 @@ format:
 
 # Лабораторная работа №7. Анализ данных сетевого трафика при помощи библиотеки Arrow
 
-## Выполнено Зайцевым Ильей Владимировичем, mragentseven@yandex.ru
+## Выполнил Зайцев Илья Владимирович, mragentseven@yandex.ru
 
 ## Цель работы
 
@@ -20,10 +20,9 @@ format:
 анализа данных: Yandex Object Storage, Rstudio Server.
 
 ## Исходные данные 
-1. Программное обеспечение Windows 11 Pro
-2. Yandex Object Storage
-3. Библиотека Apache Arrow
-4. Rstudio Desktop
+1. ОС Windows 11 Pro
+2. Rstudio Server
+3. Библиотеки arrow, dplyr, ggplot2
 
 ## Ход работы
 
@@ -32,65 +31,81 @@ format:
 ```{r}
 library(arrow)
 library(dplyr)
-library(tidyverse)
-#options(timeout = 1000000)
+library(knitr)
 #download.file("https://storage.yandexcloud.net/arrow-datasets/tm_data.pqt",destfile = "tm_data.pqt")
 
 df <- arrow::open_dataset(sources = "tm_data.pqt", format = "parquet")
 glimpse(df)
 ```
-```{r}
-file.info("tm_data.pqt")
 
-#glimpse(df)
+Задание 1. Найдите утечку данных из Вашей сети
+
+Важнейшие документы с результатами нашей исследовательской деятельности в области создания вакцин скачиваются в виде больших заархивированных дампов.
+Один из хостов в нашей сети используется для пересылки этой информации – он пересылает гораздо больше информации на внешние ресурсы в Интернете, чем
+остальные компьютеры нашей сети. Определите его IP-адрес.
+
+```{r}
+df %>% 
+  group_by(src) %>%
+  summarise(traffic = sum(bytes)) %>%
+  arrange(desc(traffic)) %>%
+  select(src) %>% collect() %>% head(1)
 ```
 
-Приступаем к выполнению заданий
+Задание 2. Найдите утечку данных 2
 
-Найдите утечку данных из вашей сети
-    
-```{r}
-task1 <- df %>% filter(str_detect(src, "^12.") | str_detect(src, "^13.") | str_detect(src, "^14."))  %>% filter(!str_detect(dst, "^12.") & !str_detect(dst, "^13.") & !str_detect(dst, "^14."))  %>% group_by(src) %>% summarise("sum" = sum(bytes)) %>% arrange(desc(sum)) %>% head(1) %>% select(src) 
-task1 %>% collect() %>% knitr::kable()
-```
-    
-Найдите утечку данных 2
-    
-Для начала нужно определить рабочее время. Для этого можно использовать нагрузку на трафик, и выцепить час с сортировкой по количеству трафика.
-    
-```{r}
-task21 <- df %>% select(timestamp, src, dst, bytes) %>% mutate(trafic = (str_detect(src, "^((12|13|14)\\.)") & !str_detect(dst, "^((12|13|14)\\.)")),time = hour(as_datetime(timestamp/1000))) %>% filter(trafic == TRUE, time >= 0 & time <= 24) %>% group_by(time) %>%
-summarise(trafictime = n()) %>% arrange(desc(trafictime))
-task21 %>% collect() %>% knitr::kable()
-```
-    
-По данным выясняем, что рабочим временем является 16-23. 
-    
-```{r}
-task22 <- df %>% mutate(time = hour(as_datetime(timestamp/1000))) %>% 
-filter(!str_detect(src, "^13.37.84.125")) %>%  filter(str_detect(src, "^12.") | str_detect(src, "^13.") | str_detect(src, "^14."))  %>% filter(!str_detect(dst, "^12.") | !str_detect(dst, "^13.") | !str_detect(dst, "^14."))  %>% filter(time >= 1 & time <= 15) %>%  group_by(src) %>% summarise("sum" = sum(bytes)) %>% arrange(desc(sum)) %>% head(1) %>% select(src) 
-task22 %>% collect() %>% knitr::kable()
-```
-    
-Найдите утечку данных 3
-    
-```{r}
-task31 <- df %>% filter(!str_detect(src, "^13.37.84.125")) %>% filter(!str_detect(src, "^12.55.77.96")) %>% filter(str_detect(src, "^12.") | str_detect(src, "^13.") | str_detect(src, "^14."))  %>% filter(!str_detect(dst, "^12.") & !str_detect(dst, "^13.") & !str_detect(dst, "^14."))  %>% select(src, bytes, port) 
+Другой атакующий установил автоматическую задачу в системном планировщике cron для экспорта содержимого внутренней wiki системы. Эта система генерирует
+большое количество трафика в нерабочие часы, больше чем остальные хосты. Определите IP этой системы. Известно, что ее IP адрес отличается от нарушителя из
+предыдущей задачи.
 
-
-task31 %>%  group_by(port) %>% summarise("mean"=mean(bytes), "max"=max(bytes), "sum" = sum(bytes)) %>% 
-  mutate("Raz"= max-mean)  %>% filter(Raz!=0) %>% arrange(desc(Raz)) %>% head(1) %>% collect() %>% knitr::kable()
-```
-    
 ```{r}
-task32 <- task31  %>% filter(port==37) %>% group_by(src) %>% summarise("mean"=mean(bytes)) %>% arrange(desc(mean)) %>% head(1) %>% select(src)
-task32 %>% collect() %>% knitr::kable()
+df %>% select(timestamp, src, dst, bytes) %>% mutate(trafic = (str_detect(src, "^((12|13|14)\\.)") & !str_detect(dst, "^((12|13|14)\\.)")),time = hour(as_datetime(timestamp/1000))) %>% filter(trafic == TRUE, time >= 0 & time <= 24) %>% group_by(time) %>%
+summarise(trafictime = n()) %>% arrange(desc(trafictime)) %>% collect() %>% kable()
+```
+
+Очевидно, что рабочие часы с 16 до 24
+
+```{r}
+df %>% mutate(time = hour(as_datetime(timestamp/1000))) %>%  filter(!str_detect(src, "^13.37.84.125")) %>%  filter(str_detect(src, "^12.") | str_detect(src, "^13.") | str_detect(src, "^14."))  %>% filter(!str_detect(dst, "^12.") | !str_detect(dst, "^13.") | !str_detect(dst, "^14."))  %>% filter(time >= 1 & time <= 15) %>%  group_by(src) %>% summarise("sum" = sum(bytes)) %>% arrange(desc(sum)) %>% head(1) %>% select(src) %>% collect()
+```
+
+Задание 3. Найдите утечку данных 3
+
+Еще один нарушитель собирает содержимое электронной почты и отправляет в Интернет используя порт, который обычно используется для другого типа трафика.
+Атакующий пересылает большое количество информации используя этот порт, которое нехарактерно для других хостов, использующих этот номер порта. Определите IP этой системы. Известно, что ее IP адрес отличается от нарушителей из предыдущих задач.
+
+```{r}
+ex3 <- df %>% filter(!str_detect(src, "^13.37.84.125")) %>% filter(!str_detect(src, "^12.55.77.96")) %>% filter(str_detect(src, "^12.") | str_detect(src, "^13.") | str_detect(src, "^14."))  %>% filter(!str_detect(dst, "^12.") & !str_detect(dst, "^13.") & !str_detect(dst, "^14."))  %>% select(src, bytes, port) 
+
+ex3 %>%  group_by(port) %>% summarise("mean"=mean(bytes), "max"=max(bytes), "sum" = sum(bytes)) %>% mutate("dif"= max-mean)  %>% filter(dif!=0) %>% arrange(desc(dif)) %>% head(1) %>% collect()
+```
+
+```{r}
+library(ggplot2)
+library(lubridate)
+library(tidyverse)
+df <- read_parquet('tm_data.pqt')
+df <- df %>%
+  filter(str_detect(src, "^12.") | str_detect(src, "^13.") | str_detect(src, "^14."))  %>%
+  filter(!str_detect(dst, "^12.") & !str_detect(dst, "^13.") & !str_detect(dst, "^14.")) 
+df <- df %>%
+  filter(!str_detect(src, "^13.37.84.125"))
+df <- df %>%
+  filter(src != '12.55.77.96')
+dfport <- df %>% select(src, port, bytes)
+p = 37
+dfportN <- dfport %>% filter(port == p) %>% group_by(src) %>% summarise(traffic = sum(bytes), count = n(), avg_traf = traffic/count, med = median(bytes)) %>% arrange(desc(avg_traf)) %>% collect
+ggplot(head(dfportN, 10), aes(med, src)) + geom_col()
+```
+
+```{r}
+ex3 %>% filter(port==37) %>% group_by(src) %>% summarise("mean"=mean(bytes)) %>% arrange(desc(mean)) %>% head(1) %>% select(src) %>% collect() 
 ```
 
 ## Оценка результата
 
-Был скачан и проанализирован пакет данных tm_data, были выполнены три задания.
+В результате лабораторной работы были найдены все 3 утечки данных
 
 ## Вывод
 
-Мы ознакомились с применением облачных технологий хранения, подготовки и анализа данных, а также проанализировали метаинформацию о сетевом трафике.
+Были, изучены возможности технологии Apache Arrow для обработки и анализ больших данных, получены навыки применения Arrow совместно с языком программирования R, получены навыки анализа метаинфомации о сетевом трафике и получены навыки применения облачных технологий хранения, подготовки и анализа данных: Yandex Object Storage, Rstudio Server.
