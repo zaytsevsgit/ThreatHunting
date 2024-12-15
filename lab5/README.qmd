@@ -64,98 +64,74 @@ glimpse(dataset1)
 glimpse(dataset2)
 ```
 
-Точки доступа
+## Точки доступа
+
 Определить небезопасные точки доступа (без шифрования – OPN)
   
 ```{r}
-unsafe_access_points <- dataset1 %>% filter(grepl("OPN", Privacy))
-
-unsafe_access_points %>% select(BSSID, ESSID, Privacy) %>%
+dataset1 %>% filter(grepl("OPN", Privacy)) %>% select(BSSID, ESSID, Privacy) %>%
 kable
 ```
   
 Определить производителя для каждого обнаруженного устройства
-  
-  E8:28:C1 - Eltex Enterprise Ltd
-  00:25:00 - Apple Inc
-  E0:D9:E3 - Eltex Enterprise Ltd
-  00:26:99 - Cisco Systems
-  00:03:7A - Taiyo Yuden Co
-  00:3E:1A - Xerox
-  00:03:7F6 - Atheros Communications, Inc.
+
+```{r} 
+  #E8:28:C1 - Eltex Enterprise Ltd.
+  #00:25:00 - Apple, Inc.
+  #E0:D9:E3 - Eltex Enterprise Ltd.
+  #00:26:99 - Cisco Systems, Inc.
+  #00:03:7A - Taiyo Yuden Co., Lt.
+  #00:3E:1A - Xerox
+  #00:03:7F6 - Atheros Communications, Inc.
+```
   
 Выявить устройства, использующие последнюю версию протокола шифрования WPA3, и названия точек доступа, реализованных на этих устройствах
   
 ```{r}
-wpa3_devices <- dataset1 %>% filter(grepl("WPA3", Privacy))
-
-wpa3_devices %>% select(BSSID, ESSID, Privacy)
+dataset1 %>% filter(grepl("WPA3", Privacy)) %>% select(BSSID, ESSID, Privacy)
 ```
 
 Отсортировать точки доступа по интервалу времени, в течение которого они находились на связи, по убыванию.
 
 ```{r}
-wireNetData <- dataset1 %>% mutate(Time = difftime(Last.time.seen, First.time.seen, units = "mins")) %>% arrange(desc(Time)) %>% select(BSSID, Time)
-
-
-# Просмотр отсортированных данных
-wireNetData %>% select(BSSID, Time) %>% kable 
+dataset1 %>% mutate(interval = difftime(Last.time.seen, First.time.seen, units = "mins")) %>% arrange(desc(interval)) %>% select(BSSID, interval) %>% kable 
 ```
 
 Обнаружить топ-10 самых быстрых точек доступа.
   
 ```{r}
-top_10_fastest <- dataset1 %>% arrange(desc(Speed)) %>% slice(1:10)
-
-top_10_fastest %>% select(BSSID, ESSID, Speed)
+dataset1 %>% arrange(desc(Speed)) %>% slice(1:10) %>% select(BSSID, ESSID, Speed)
 ```
   
 Отсортировать точки доступа по частоте отправки запросов (beacons) в единицу времени по их убыванию.
   
 ```{r}
-beacon_rate <- dataset1 %>% mutate(beacon_rate = beacons /as.numeric(difftime(Last.time.seen,First.time.seen,units="mins"))) %>%filter(!is.infinite(beacon_rate)) %>%arrange(desc(beacon_rate))
-
-beacon_rate %>% select(BSSID, ESSID, beacon_rate) %>% kable
+dataset1 %>% mutate(beacon_rate = beacons /as.numeric(difftime(Last.time.seen, First.time.seen,units="mins"))) %>% filter(!is.infinite(beacon_rate)) %>% arrange(desc(beacon_rate)) %>% select(BSSID, ESSID, beacon_rate) %>% kable
 ```
 
-Данные клиентов
+## Данные клиентов
 Определить производителя для каждого обнаруженного устройства
   
 ```{r}
-manufa <- dataset2 %>% filter(BSSID != '(not associated)') %>% mutate(Manufacturer = substr(BSSID, 1, 8)) %>% select(Manufacturer)
-
-unique(manufa) %>%
-  kable
+dataset2 %>% filter(BSSID != "(not associated)") %>% mutate(producer = substr(BSSID, 1, 8)) %>% select(producer) %>% unique() %>% kable
 ```
 
 Обнаружить устройства, которые НЕ рандомизируют свой MAC адрес
   
 ```{r}
-non_randomized_mac <- dataset2 %>% filter(!grepl("^02|^06|^0A|^0E", BSSID)) %>% filter(BSSID != '(not associated)')
-
-non_randomized_mac %>% select(BSSID) %>% kable
+dataset2 %>% select(BSSID) %>% filter(!grepl("^02|^06|^0A|^0E", BSSID)) %>% filter(BSSID != '(not associated)') %>% kable
 ```
-  
-  
+
 Кластеризовать запросы от устройств к точкам доступа по их именам. Определить время появления устройства в зоне радиовидимости и время выхода его из нее.
   
 ```{r}
-clustered_requests <- dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(
-first_seen = min(First.time.seen, na.rm = TRUE),
-last_seen = max(Last.time.seen, na.rm = TRUE))
-
-clustered_requests %>% 
-  kable()
+dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(first_seen = min(First.time.seen, na.rm = TRUE), last_seen = max(Last.time.seen, na.rm = TRUE)) %>% kable()
 ```
-  
-  
+
 Оценить стабильность уровня сигнала внури кластера во времени. Выявить наиболее стабильный кластер.
   
 ```{r}
-signal_stability <- dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(sd_signal = sd(Power, na.rm = TRUE)) %>% arrange(sd_signal)
-
-signal_stability %>%
-  kable
+dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(sd = sd(Power, na.rm = TRUE), mean = mean(Power, na.rm = TRUE)) %>% arrange(sd) %>% head(1)
 ```
 
 ## Оценка результата

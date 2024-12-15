@@ -124,13 +124,12 @@ glimpse(dataset2)
     $ X.6             <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
     $ X.7             <lgl> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA…
 
-Точки доступа Определить небезопасные точки доступа (без шифрования –
-OPN)
+## Точки доступа
+
+Определить небезопасные точки доступа (без шифрования – OPN)
 
 ``` r
-unsafe_access_points <- dataset1 %>% filter(grepl("OPN", Privacy))
-
-unsafe_access_points %>% select(BSSID, ESSID, Privacy) %>%
+dataset1 %>% filter(grepl("OPN", Privacy)) %>% select(BSSID, ESSID, Privacy) %>%
 kable
 ```
 
@@ -358,17 +357,21 @@ kable
 
 Определить производителя для каждого обнаруженного устройства
 
-E8:28:C1 - Eltex Enterprise Ltd 00:25:00 - Apple Inc E0:D9:E3 - Eltex
-Enterprise Ltd 00:26:99 - Cisco Systems 00:03:7A - Taiyo Yuden Co
-00:3E:1A - Xerox 00:03:7F6 - Atheros Communications, Inc.
+``` r
+  #E8:28:C1 - Eltex Enterprise Ltd.
+  #00:25:00 - Apple, Inc.
+  #E0:D9:E3 - Eltex Enterprise Ltd.
+  #00:26:99 - Cisco Systems, Inc.
+  #00:03:7A - Taiyo Yuden Co., Lt.
+  #00:3E:1A - Xerox
+  #00:03:7F6 - Atheros Communications, Inc.
+```
 
 Выявить устройства, использующие последнюю версию протокола шифрования
 WPA3, и названия точек доступа, реализованных на этих устройствах
 
 ``` r
-wpa3_devices <- dataset1 %>% filter(grepl("WPA3", Privacy))
-
-wpa3_devices %>% select(BSSID, ESSID, Privacy)
+dataset1 %>% filter(grepl("WPA3", Privacy)) %>% select(BSSID, ESSID, Privacy)
 ```
 
                   BSSID              ESSID   Privacy
@@ -385,18 +388,14 @@ wpa3_devices %>% select(BSSID, ESSID, Privacy)
 находились на связи, по убыванию.
 
 ``` r
-wireNetData <- dataset1 %>% mutate(Time = difftime(Last.time.seen, First.time.seen, units = "mins")) %>% arrange(desc(Time)) %>% select(BSSID, Time)
-
-
-# Просмотр отсортированных данных
-wireNetData %>% select(BSSID, Time) %>% kable 
+dataset1 %>% mutate(interval = difftime(Last.time.seen, First.time.seen, units = "mins")) %>% arrange(desc(interval)) %>% select(BSSID, interval) %>% kable 
 ```
 
 <table>
 <thead>
 <tr class="header">
 <th style="text-align: left;">BSSID</th>
-<th style="text-align: left;">Time</th>
+<th style="text-align: left;">interval</th>
 </tr>
 </thead>
 <tbody>
@@ -1074,9 +1073,7 @@ wireNetData %>% select(BSSID, Time) %>% kable
 Обнаружить топ-10 самых быстрых точек доступа.
 
 ``` r
-top_10_fastest <- dataset1 %>% arrange(desc(Speed)) %>% slice(1:10)
-
-top_10_fastest %>% select(BSSID, ESSID, Speed)
+dataset1 %>% arrange(desc(Speed)) %>% slice(1:10) %>% select(BSSID, ESSID, Speed)
 ```
 
                    BSSID              ESSID Speed
@@ -1095,9 +1092,7 @@ top_10_fastest %>% select(BSSID, ESSID, Speed)
 единицу времени по их убыванию.
 
 ``` r
-beacon_rate <- dataset1 %>% mutate(beacon_rate = beacons /as.numeric(difftime(Last.time.seen,First.time.seen,units="mins"))) %>%filter(!is.infinite(beacon_rate)) %>%arrange(desc(beacon_rate))
-
-beacon_rate %>% select(BSSID, ESSID, beacon_rate) %>% kable
+dataset1 %>% mutate(beacon_rate = beacons /as.numeric(difftime(Last.time.seen, First.time.seen,units="mins"))) %>% filter(!is.infinite(beacon_rate)) %>% arrange(desc(beacon_rate)) %>% select(BSSID, ESSID, beacon_rate) %>% kable
 ```
 
 <table>
@@ -1882,21 +1877,19 @@ beacon_rate %>% select(BSSID, ESSID, beacon_rate) %>% kable
 </tbody>
 </table>
 
-Данные клиентов Определить производителя для каждого обнаруженного
-устройства
+## Данные клиентов
+
+Определить производителя для каждого обнаруженного устройства
 
 ``` r
-manufa <- dataset2 %>% filter(BSSID != '(not associated)') %>% mutate(Manufacturer = substr(BSSID, 1, 8)) %>% select(Manufacturer)
-
-unique(manufa) %>%
-  kable
+dataset2 %>% filter(BSSID != "(not associated)") %>% mutate(producer = substr(BSSID, 1, 8)) %>% select(producer) %>% unique() %>% kable
 ```
 
 <table>
 <thead>
 <tr class="header">
 <th style="text-align: left;"></th>
-<th style="text-align: left;">Manufacturer</th>
+<th style="text-align: left;">producer</th>
 </tr>
 </thead>
 <tbody>
@@ -2098,9 +2091,7 @@ unique(manufa) %>%
 Обнаружить устройства, которые НЕ рандомизируют свой MAC адрес
 
 ``` r
-non_randomized_mac <- dataset2 %>% filter(!grepl("^02|^06|^0A|^0E", BSSID)) %>% filter(BSSID != '(not associated)')
-
-non_randomized_mac %>% select(BSSID) %>% kable
+dataset2 %>% select(BSSID) %>% filter(!grepl("^02|^06|^0A|^0E", BSSID)) %>% filter(BSSID != '(not associated)') %>% kable
 ```
 
 <table>
@@ -2670,12 +2661,7 @@ non_randomized_mac %>% select(BSSID) %>% kable
 выхода его из нее.
 
 ``` r
-clustered_requests <- dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(
-first_seen = min(First.time.seen, na.rm = TRUE),
-last_seen = max(Last.time.seen, na.rm = TRUE))
-
-clustered_requests %>% 
-  kable()
+dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(first_seen = min(First.time.seen, na.rm = TRUE), last_seen = max(Last.time.seen, na.rm = TRUE)) %>% kable()
 ```
 
 <table>
@@ -3239,454 +3225,13 @@ clustered_requests %>%
 наиболее стабильный кластер.
 
 ``` r
-signal_stability <- dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(sd_signal = sd(Power, na.rm = TRUE)) %>% arrange(sd_signal)
-
-signal_stability %>%
-  kable
+dataset2 %>% group_by(Probed.ESSIDs) %>% summarise(sd = sd(Power, na.rm = TRUE), mean = mean(Power, na.rm = TRUE)) %>% arrange(sd) %>% head(1)
 ```
 
-<table>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Probed.ESSIDs</th>
-<th style="text-align: right;">sd_signal</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Galaxy A71</td>
-<td style="text-align: right;">0.7071068</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Kesha</td>
-<td style="text-align: right;">1.4142136</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">podval</td>
-<td style="text-align: right;">1.6329932</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Tupik</td>
-<td style="text-align: right;">2.3094011</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">KB-12</td>
-<td style="text-align: right;">2.8284271</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Reconn-Guest</td>
-<td style="text-align: right;">2.8284271</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">MT_FREE</td>
-<td style="text-align: right;">2.9664794</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">IKB</td>
-<td style="text-align: right;">3.0550505</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">OKB</td>
-<td style="text-align: right;">3.0550505</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Rayskaya_banya</td>
-<td style="text-align: right;">3.0550505</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">vestis.local</td>
-<td style="text-align: right;">3.4156503</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AAAAAOB/CC0ADwGkRedmi 3S</td>
-<td style="text-align: right;">4.0000000</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Vladimir</td>
-<td style="text-align: right;">4.1231056</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Alex-net2</td>
-<td style="text-align: right;">4.2426407</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Beeline_5G_F2F425</td>
-<td style="text-align: right;">4.2426407</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Sber-Guest</td>
-<td style="text-align: right;">4.2426407</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">1</td>
-<td style="text-align: right;">4.3065342</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">-D-13-</td>
-<td style="text-align: right;">5.0066622</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Galaxy A31CAED</td>
-<td style="text-align: right;">5.0103608</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Spartak</td>
-<td style="text-align: right;">5.0332230</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Avenue611</td>
-<td style="text-align: right;">5.0413005</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">GIVC</td>
-<td style="text-align: right;">5.0839173</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">edeeeèe</td>
-<td style="text-align: right;">5.2190129</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Шк</td>
-<td style="text-align: right;">5.2915026</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">iPhone (Максим)</td>
-<td style="text-align: right;">5.3397848</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">iPhone (Дима )</td>
-<td style="text-align: right;">5.3816584</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">region</td>
-<td style="text-align: right;">5.4078385</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AndroidShare_1901</td>
-<td style="text-align: right;">5.4986629</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">iPhone (2)</td>
-<td style="text-align: right;">5.6568542</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">IT2 Wireless</td>
-<td style="text-align: right;">5.7294528</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">HONOR 30</td>
-<td style="text-align: right;">5.7608964</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Gardenpasanauri</td>
-<td style="text-align: right;">5.8344828</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">M26</td>
-<td style="text-align: right;">6.0000000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">MGTS_GPON5_C59A</td>
-<td style="text-align: right;">6.1101009</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Keenetic-8899</td>
-<td style="text-align: right;">7.5689424</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">mirea</td>
-<td style="text-align: right;">7.5718778</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Beeline121</td>
-<td style="text-align: right;">7.7974355</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">MIREA_GUESTS</td>
-<td style="text-align: right;">8.2318732</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">C322U06 5179</td>
-<td style="text-align: right;">8.4852814</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Redmi Note 8 Pro</td>
-<td style="text-align: right;">8.4852814</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">home 466</td>
-<td style="text-align: right;">8.4852814</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">SSU_BR5</td>
-<td style="text-align: right;">8.7177979</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">it</td>
-<td style="text-align: right;">9.0000000</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AndroidShare_1576</td>
-<td style="text-align: right;">9.1225671</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Timo Resort</td>
-<td style="text-align: right;">9.3897107</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">NA</td>
-<td style="text-align: right;">9.7125092</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Optus_B818_87A5</td>
-<td style="text-align: right;">9.8994949</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">MTS_GPON5_ac0968</td>
-<td style="text-align: right;">10.1324561</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">MIREA_HOTSPOT</td>
-<td style="text-align: right;">10.3365586</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">RT-WiFi-8A6C</td>
-<td style="text-align: right;">10.9348721</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">KOTIKI_XXX</td>
-<td style="text-align: right;">11.0151411</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">KB-13</td>
-<td style="text-align: right;">11.1892806</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">nvripcsuite</td>
-<td style="text-align: right;">18.1475435</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">C322U13 3965</td>
-<td style="text-align: right;">19.7989899</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Cnet</td>
-<td style="text-align: right;">25.0333111</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">107</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">531</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AKADO-D967</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">AQAAAB6zaIoATwEURedmi Note 5</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">ASUS</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">AndroidAP177B</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AndroidShare_2061</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">AndroidShare_2280</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">AndroidShare_3542</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">AndroidShare_8927</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Antonchik</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Belorusneft Free</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">C322U21 0566</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">C349U26 3598</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">CPPK_FREE</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">DIRECT-03-BMW44597</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Damy</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Dex_Pro</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">GGWPRedmi Note 10S</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Guest Concept</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Iceberg Village</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">KC</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">MGTC_GRON5_1333</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">MGTS_GPON5_06B2</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">MGTS_makmak</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">MTS_1676884</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">MTS_GPON_8cedb0</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Nizhegorodets</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">NoW</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">OnePlus 6T</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">POCO X5 Pro 5G</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Ramnet_A56263</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Redmi</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Redmi 12</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Redmi Note 9S</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">SERVICE.live</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">SevenSky2.4G</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Snickers_ASSA</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Tatiana</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Wi-Fi</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">WiFi2</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"></td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">cpe-26C1C3</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">helvetia-free</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">iPhone (Искандер)</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">iPhone (тамара)</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">linksys</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">lounge</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">realme 10</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">rediska</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">support22</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">xt3 w64dtgv5cfrxhttps://vk.com/v</td>
-<td style="text-align: right;">NA</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Максимка</td>
-<td style="text-align: right;">NA</td>
-</tr>
-</tbody>
-</table>
+    # A tibble: 1 × 3
+      Probed.ESSIDs    sd  mean
+      <chr>         <dbl> <dbl>
+    1 Galaxy A71    0.707 -48.5
 
 ## Оценка результата
 
