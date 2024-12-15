@@ -19,7 +19,7 @@
 1.  ОС Windows 11 Pro
 2.  Rstudio Desktop
 3.  Интерпретатор языка R 4.4.1
-4.  Данные csv-файла P2_wifi_data
+4.  Csv-файл P2_wifi_data
 
 ## Ход работы
 
