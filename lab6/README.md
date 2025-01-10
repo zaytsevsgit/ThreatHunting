@@ -62,7 +62,7 @@
 
 ![](img/6.png)
 
-Ссылка на дашборд: https://datalens.yandex.cloud/gwz7l31pmm723?\_lang=ru
+Ссылка на [дашборд](https://datalens.yandex.cloud/gwz7l31pmm723?_lang=ru)
 
 ## Оценка результата
 
